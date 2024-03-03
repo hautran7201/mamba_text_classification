@@ -11,14 +11,12 @@ Library
     !pip install datasets evaluate accelerate
     !pip install causal-conv1d>=1.1.0
     !pip install mamba-ssm
+    !pip install configargparse
 ```
 
 Env
 ```bash
-    !export LC_ALL="en_US.UTF-8"
-    !export LD_LIBRARY_PATH="/usr/lib64-nvidia"
-    !export LIBRARY_PATH="/usr/local/cuda/lib64/stubs"
-    !ldconfig /usr/lib64-nvidia
+    !echo /usr/lib64-nvidia/ >/etc/ld.so.conf.d/libcuda.conf; ldconfig
 ```
 
     
@@ -27,7 +25,11 @@ Env
 Train model
 
 ```bash
-    !python main.py
+    !python train.py
+```
+
+```bash
+    !python infer.py --infer_data "I like it"
 ```
 
 

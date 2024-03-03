@@ -85,7 +85,7 @@ class MambaTextClassification(MambaLMHeadModel):
         inputs = torch.tensor(tokenizer(text)['input_ids'], device=self.device)[None]
         
         with torch.no_grad():
-            logits = self.forward(input).logits[0]
+            logits = self.forward(inputs).logits[0]
             label = np.argmax(logits.cpu().numpy())
 
         if id2label:
@@ -97,7 +97,7 @@ class MambaTextClassification(MambaLMHeadModel):
     def from_pretrained(cls, pretrained_model_name, device=None, dtype=None, **kwargs):
         config_data = load_config_hf(pretrained_model_name)        
         config = MambaConfig(**config_data)
-        model = cls(config_data, device=device, dtype=dtype)
+        model = cls(config, device=device, dtype=dtype)
 
         model_state_dict = load_state_dict_hf(
             pretrained_model_name,
@@ -111,7 +111,7 @@ class MambaTextClassification(MambaLMHeadModel):
               set(model.state_dict().keys()) - set(model_state_dict.keys())
         )
 
-        return model
+        return model.to(device)
 
 class MambaTrainer(Trainer):
     def __init__(self, **kwargs):        
@@ -140,14 +140,3 @@ class MambaTrainer(Trainer):
 
         with open(f'{output_dir}/config.json', 'w') as f:
             json.dump(self.model.config.to_dict(), f)
-
-        
-
-
-
-
-
-
-
-
-
