@@ -11,6 +11,7 @@ from mamba_ssm.utils.hf import load_config_hf , load_state_dict_hf
 from collections import namedtuple
 
 
+@dataclass
 class MambaConfig:
     d_model: int = 2560
     n_layer: int = 64
@@ -22,15 +23,10 @@ class MambaConfig:
     pad_vocab_size_multiple:int = 8
     tie_embeddings = None
 
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-
     def to_json_string(self):
         return json.dumps(asdict(self))
 
-    def to_dict(self) :
+    def to_dict(self):
         return asdict(self)
 
 class MambaClassificationHead(nn.Module):
@@ -78,7 +74,7 @@ class MambaTextClassification(MambaLMHeadModel):
         else:
             ClassificationOutput = namedtuple(
                 'ClassificationOutput',
-                ['losses', 'logits']    
+                ['loss', 'logits']    
             )
 
             loss_fct = nn.CrossEntropyLoss()
@@ -101,8 +97,7 @@ class MambaTextClassification(MambaLMHeadModel):
     def from_pretrained(cls, pretrained_model_name, device=None, dtype=None, **kwargs):
         config_data = load_config_hf(pretrained_model_name)        
         config = MambaConfig(**config_data)
-
-        model = cls(config, device=device, dtype=dtype)
+        model = cls(config_data, device=device, dtype=dtype)
 
         model_state_dict = load_state_dict_hf(
             pretrained_model_name,
